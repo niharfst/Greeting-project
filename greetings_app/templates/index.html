@@ -1,0 +1,83 @@
+{% comment %} <!DOCTYPE html>
+<html>
+<head>
+    <title>Speech Recognition Greeting</title>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script>
+        function startRecognition() {
+            var recognition = new webkitSpeechRecognition();
+            recognition.continuous = false;
+            recognition.interimResults = false;
+
+            recognition.onresult = function(event) {
+                var name = event.results[0][0].transcript;
+                var csrfToken = $('input[name="csrfmiddlewaretoken"]').val();  // Get the CSRF token from the hidden input field
+                var url = '/greet/';
+                var data = {
+                    'name': name,
+                    'csrfmiddlewaretoken': csrfToken  // Include the CSRF token in the request data
+                };
+
+                $.post(url, data, function(response) {
+                    document.body.innerHTML = response;
+                });
+            };
+
+            recognition.start();
+        }
+    </script>
+</head>
+<body>
+    <h1>Speech Recognition Greeting</h1>
+    <button onclick="startRecognition()">Start Recognition</button>
+
+    {% csrf_token %}  <!-- Include the CSRF token as a hidden input field -->
+
+</body>
+</html> {% endcomment %}
+
+
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Speech Recognition Greeting</title>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script>
+        function startRecognition() {
+            var recognition = new webkitSpeechRecognition();
+            recognition.continuous = false;
+            recognition.interimResults = false;
+
+            recognition.onresult = function(event) {
+                var name = event.results[0][0].transcript;
+                var csrfToken = $('input[name="csrfmiddlewaretoken"]').val();
+                var url = '/greet/';
+
+                $.ajax({
+                    type: 'POST',
+                    url: url,
+                    data: {
+                        'name': name,
+                        'csrfmiddlewaretoken': csrfToken    
+                    },
+                    success: function(response) {
+                        document.body.innerHTML = response;
+                    },
+                    error: function(xhr, status, error) {
+                        console.error(xhr.responseText);
+                    }
+                });
+            };
+
+            recognition.start();
+        }
+    </script>
+</head>
+<body>
+    <h1>What is your name</h1>
+    <button onclick="startRecognition()">Start </button>
+
+    {% csrf_token %}
+
+</body>
+</html>
